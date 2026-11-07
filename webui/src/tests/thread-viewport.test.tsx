@@ -1054,6 +1054,33 @@ describe("ThreadViewport", () => {
     expect(navigateLatestTo).toHaveBeenCalledWith(1_800);
   });
 
+  it("keeps the scroll-to-bottom button hidden while smooth navigation is still travelling", () => {
+    const { container } = render(
+      <ThreadViewport
+        messages={messages}
+        isStreaming
+        composer={<div>composer</div>}
+      />,
+    );
+    const scroller = getScroller(container);
+    Object.defineProperties(scroller, {
+      scrollHeight: { configurable: true, value: 2_400 },
+      clientHeight: { configurable: true, value: 600 },
+      scrollTop: { configurable: true, writable: true, value: 0 },
+    });
+
+    act(() => {
+      dispatchUserScroll(scroller);
+    });
+    fireEvent.click(screen.getByRole("button", { name: "Scroll to bottom" }));
+    act(() => {
+      scroller.scrollTop = 900;
+      fireEvent.scroll(scroller);
+    });
+
+    expect(screen.queryByRole("button", { name: "Scroll to bottom" })).not.toBeInTheDocument();
+  });
+
   it("pins the waiting boundary across composer and grid-track growth", async () => {
     const resizeObserver = stubResizeObserver();
     const jumpTo = vi.spyOn(ThreadCameraController.prototype, "jumpTo");

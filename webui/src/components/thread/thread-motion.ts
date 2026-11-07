@@ -334,6 +334,10 @@ export class ThreadMotionCoordinator {
     return this.isHistoryMode();
   }
 
+  isNavigatingLatest(): boolean {
+    return this.mode === "navigating-latest";
+  }
+
   isBrowsingHistory(): boolean {
     return this.mode === "browsing-history";
   }
